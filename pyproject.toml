@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.scripts]
-crutch = 'alais.main:entrypoint'
+alais = 'alais.main:entrypoint'
 
 [tool.setuptools.dynamic]
 readme = {file = ['README.md'], content-type = 'text/markdown'}
