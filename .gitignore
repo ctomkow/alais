@@ -1,0 +1,5 @@
+.idea
+dist
+build
+venv
+src/alais/__pycache__
