@@ -3,12 +3,12 @@ requires = ['setuptools>=61.0']
 build-backend = 'setuptools.build_meta'
 
 [project]
-name = "crutch"
+name = "alais"
 dynamic = ['version']
 authors = [
     {name = 'Craig Tomkow', email = 'ctomkow@gmail.com'},
 ]
-description = 'A crutch for your terminal typos'
+description = 'An alais for your terminal typos'
 requires-python = '>=3.6'
 license = {file = 'LICENSE'}
 classifiers = [
@@ -22,8 +22,8 @@ classifiers = [
 ]
 
 [project.scripts]
-crutch = 'crutch.main:entrypoint'
+crutch = 'alais.main:entrypoint'
 
 [tool.setuptools.dynamic]
 readme = {file = ['README.md'], content-type = 'text/markdown'}
-version = {file = ['src/crutch/VERSION']}
+version = {file = ['src/alais/VERSION']}
