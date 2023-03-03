@@ -9,3 +9,8 @@ An alais for your terminal typos
 `alais me`
 
 `alais me-not`
+
+### todo
+* source .bashrc so no need to reload terminal
+* more alaises
+
