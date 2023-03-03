@@ -19,3 +19,7 @@ Adds alaises to .bash_aliases
 * source .bashrc so no need to reload terminal
 * more alaises
 
+### PR's welcome
+Restrictions
+* aliases must not conflict with an installable program (e.g. apt/yum install) from standard repos.
+
