@@ -4,3 +4,4 @@ build
 venv
 src/alais/__pycache__
 src/alais.egg-info
+tests/.pytest_cache
