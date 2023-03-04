@@ -1,6 +1,9 @@
 [build-system]
-requires = ['setuptools>=61.0']
-build-backend = 'setuptools.build_meta'
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/alais/version.py"
 
 [project]
 name = "alais"
@@ -21,9 +24,14 @@ classifiers = [
     'Programming Language :: Python :: 3.11',
 ]
 
+[project.optional-dependencies]
+tests = [
+    "pytest>=7.2.2,<8.0.0"
+]
+
 [project.scripts]
 alais = 'alais.main:entrypoint'
 
 [tool.setuptools.dynamic]
 readme = {file = ['README.md'], content-type = 'text/markdown'}
-version = {file = ['src/alais/VERSION']}
+version = {attr = 'alais.version.py.__version__'}

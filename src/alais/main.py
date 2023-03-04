@@ -1,7 +1,9 @@
 # Craig Tomkow, 2023
-#
+
+# local imports
+from alais.version import __version__
+
 # python imports
-import os
 from pathlib import Path
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, Namespace
 from re import sub
@@ -9,18 +11,9 @@ from re import sub
 
 def entrypoint():
 
-    version = _read_version()
-    parser = _flags(version)
+    parser = _flags(__version__)
     args = parser.parse_args()
     _parse_input(args)
-
-
-def _read_version() -> str:
-
-    # read from the VERSION file
-    with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
-        version = version_file.read().strip()
-    return version
 
 
 def _flags(version: str) -> ArgumentParser:
@@ -47,38 +40,46 @@ An alais for your terminal typos
 
 def _parse_input(args: Namespace) -> None:
 
+    bash_aliases = Path(Path.home(), '.bash_aliases')
+
     if 'me' in args:
-        _install(custom_aliases)
+        _add_preamble(bash_aliases)
+        _install_aliases(custom_aliases, bash_aliases)
         print("alais'd!")
     elif 'me-not' in args:
-        _uninstall(custom_aliases)
+        _uninstall_aliases(custom_aliases, bash_aliases)
         print("unalais'd!")
 
 
-# must be idempotent
-def _install(aliases: dict) -> None:
+def _add_preamble(bash_aliases: Path) -> None:
 
-    with Path(Path.home(), '.bash_aliases').open('a') as f:
+    with bash_aliases.open('a') as f:
         f.write('\n')
         f.write('# written by alais\n')
+
+
+# todo: must be idempotent
+def _install_aliases(aliases: dict, bash_aliases: Path) -> None:
+
+    with bash_aliases.open('a') as f:
         for k, v in aliases.items():
             f.write(f"alias {k}='{v}'\n")
 
 
 # must be idempotent
-def _uninstall(aliases: dict) -> None:
+def _uninstall_aliases(aliases: dict, bash_aliases: Path) -> None:
 
-    with Path(Path.home(), '.bash_aliases').open('r') as f:
+    with bash_aliases.open('r') as f:
         user_bash_aliases = f.readlines()
 
-    with Path(Path.home(), '.bash_aliases').open('w') as f:
+    with bash_aliases.open('w') as f:
         for line in user_bash_aliases:
             f.write(sub(r"^# written by alais\n$", "", line))
 
     for k, v in aliases.items():
-        with Path(Path.home(), '.bash_aliases').open('r') as f:
+        with bash_aliases.open('r') as f:
             user_bash_aliases = f.readlines()
-        with Path(Path.home(), '.bash_aliases').open('w') as f:
+        with bash_aliases.open('w') as f:
             for line in user_bash_aliases:
                 f.write(sub(fr"^alias {k}='{v}'\n$", "", line))
 
