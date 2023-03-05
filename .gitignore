@@ -5,3 +5,5 @@ venv
 src/alais/__pycache__
 src/alais.egg-info
 tests/.pytest_cache
+.coverage
+tests/__pycache__

@@ -7,6 +7,7 @@ from alais.version import __version__
 from pathlib import Path
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, Namespace
 from re import sub
+from typing import Dict
 
 
 def entrypoint():
@@ -44,30 +45,34 @@ def _parse_input(args: Namespace) -> None:
 
     if 'me' in args:
         _add_preamble(bash_aliases)
-        _install_aliases(custom_aliases, bash_aliases)
+        _add_aliases(custom_aliases, bash_aliases)
         print("alais'd!")
     elif 'me-not' in args:
-        _uninstall_aliases(custom_aliases, bash_aliases)
+        _remove_aliases(custom_aliases, bash_aliases)
         print("unalais'd!")
 
 
+# idempotent
 def _add_preamble(bash_aliases: Path) -> None:
 
-    with bash_aliases.open('a') as f:
-        f.write('\n')
-        f.write('# written by alais\n')
+    if not _line_exists_in_file('# written by alais\n', bash_aliases):
+        bash_aliases.write_text('# written by alais\n')
 
+
+# idempotent
+def _add_aliases(aliases: Dict, bash_aliases: Path) -> None:
+
+    with bash_aliases.open('a') as fp:
+        for k, v in aliases.items():
+            alias = f"alias {k}='{v}'\n"
+            if not _line_exists_in_file(alias, bash_aliases):
+                fp.write(alias)
+
+
+# todo: _remove_preamble
 
 # todo: must be idempotent
-def _install_aliases(aliases: dict, bash_aliases: Path) -> None:
-
-    with bash_aliases.open('a') as f:
-        for k, v in aliases.items():
-            f.write(f"alias {k}='{v}'\n")
-
-
-# must be idempotent
-def _uninstall_aliases(aliases: dict, bash_aliases: Path) -> None:
+def _remove_aliases(aliases: Dict, bash_aliases: Path) -> None:
 
     with bash_aliases.open('r') as f:
         user_bash_aliases = f.readlines()
@@ -84,12 +89,25 @@ def _uninstall_aliases(aliases: dict, bash_aliases: Path) -> None:
                 f.write(sub(fr"^alias {k}='{v}'\n$", "", line))
 
 
+def _line_exists_in_file(elem: str, file: Path) -> bool:
+
+    if not file.exists():
+        return False
+    with file.open('r') as fp:
+        lines = fp.readlines()
+    for line in lines:
+        if elem == line:
+            return True
+    return False
+
+
 # thanks chatGPT!
 custom_aliases = {
     'clera': 'clear',
     'claer': 'clear',
     'celar': 'clear',
     'cler': 'clear',
+    'cear': 'clear',
     'gerp': 'grep',
     'greap': 'grep',
     'grpe': 'grep',
