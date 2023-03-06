@@ -13,11 +13,12 @@ Alaises for your terminal typos
 `alais me-not`
 
 ### how it works
-Adds alaises to .bash_aliases
+Add aliases to .bash_aliases
 
 ### todo
 * source .bashrc so no need to reload terminal
-* more alaises
+* support for when an alias is removed from alais, should purge any non-existent aliases after preamble
+* add functions as aliases to do the reverse of a normal alias (e.g. stop: `sudo rm -rf /`)
 
 ### PR's welcome
 Restrictions

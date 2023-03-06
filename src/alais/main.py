@@ -55,8 +55,9 @@ def _parse_input(args: Namespace) -> None:
 # idempotent
 def _add_preamble(bash_aliases: Path) -> None:
 
-    if not _line_exists_in_file('# written by alais\n', bash_aliases):
-        bash_aliases.write_text('# written by alais\n')
+    if not _line_in_file('# written by alais\n', bash_aliases):
+        with bash_aliases.open('a') as fp:
+            fp.write('# written by alais\n')
 
 
 # idempotent
@@ -65,31 +66,31 @@ def _add_aliases(aliases: Dict, bash_aliases: Path) -> None:
     with bash_aliases.open('a') as fp:
         for k, v in aliases.items():
             alias = f"alias {k}='{v}'\n"
-            if not _line_exists_in_file(alias, bash_aliases):
+            if not _line_in_file(alias, bash_aliases):
                 fp.write(alias)
 
 
-# todo: _remove_preamble
+def _remove_preamble(bash_aliases: Path) -> None:
 
-# todo: must be idempotent
+    with bash_aliases.open('r') as fp:
+        user_bash_aliases = fp.readlines()
+
+    with bash_aliases.open('w') as fp:
+        for line in user_bash_aliases:
+            fp.write(sub(r'^# written by alais\n', '', line))
+
+
 def _remove_aliases(aliases: Dict, bash_aliases: Path) -> None:
 
-    with bash_aliases.open('r') as f:
-        user_bash_aliases = f.readlines()
-
-    with bash_aliases.open('w') as f:
-        for line in user_bash_aliases:
-            f.write(sub(r"^# written by alais\n$", "", line))
-
     for k, v in aliases.items():
-        with bash_aliases.open('r') as f:
-            user_bash_aliases = f.readlines()
-        with bash_aliases.open('w') as f:
+        with bash_aliases.open('r') as fp:
+            user_bash_aliases = fp.readlines()
+        with bash_aliases.open('w') as fp:
             for line in user_bash_aliases:
-                f.write(sub(fr"^alias {k}='{v}'\n$", "", line))
+                fp.write(sub(fr"^alias {k}='{v}'\n$", '', line))
 
 
-def _line_exists_in_file(elem: str, file: Path) -> bool:
+def _line_in_file(elem: str, file: Path) -> bool:
 
     if not file.exists():
         return False
@@ -100,6 +101,8 @@ def _line_exists_in_file(elem: str, file: Path) -> bool:
             return True
     return False
 
+
+custom_function_aliases = False
 
 # thanks chatGPT!
 custom_aliases = {
@@ -120,9 +123,10 @@ custom_aliases = {
     'sudu': 'sudo',
     'sodo': 'sudo',
     'sduo': 'sudo',
-    #'sl': 'ls',
     'lls': 'ls',
     'lis': 'ls',
+    'lsl': 'ls',
+    'os': 'ls',
     'cv': 'cd',
     'cx': 'cd',
     'cds': 'cd',
@@ -144,4 +148,37 @@ custom_aliases = {
     'tare': 'tar',
     'atr': 'tar',
     'eixt': 'exit',
+    'catr': 'cat',
+    'ca': 'cat',
+    'catt': 'cat',
+    'cta': 'cat',
+    'akw': 'awk',
+    'wak': 'awk',
+    'awkk': 'awk',
+    'wka': 'awk',
+    'esd': 'sed',
+    'sde': 'sed',
+    'se': 'sed',
+    'fidn': 'find',
+    'fnd': 'find',
+    'finf': 'find',
+    'fimd': 'find',
+    'tpo': 'top',
+    'to': 'top',
+    'sp': 'ps',
+    'shh': 'ssh',
+    'sah': 'ssh',
+    'hss': 'ssh',
+    'csp': 'scp',
+    'scl': 'scp',
+    'sxp': 'scp',
+    'wegt': 'wget',
+    'get': 'wget',
+    'wet': 'wget',
+    'wger': 'wget',
+    'crl': 'curl',
+    'culr': 'curl',
+    'cur': 'curl',
+    'curel': 'curl',
+    'crul': 'curl',
 }

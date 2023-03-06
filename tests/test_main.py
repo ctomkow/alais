@@ -49,14 +49,30 @@ def test_add_aliases(aliases, bash_aliases):
     bash_aliases.unlink()
 
 
-def test_line_exists_in_file(bash_aliases):
+def test_remove_preamble(bash_aliases):
 
-    bash_aliases.write_text('test string')
-    assert main._line_exists_in_file('test string', bash_aliases)
+    main._add_preamble(bash_aliases)
+    main._remove_preamble(bash_aliases)
+    assert bash_aliases.read_text() == ''
     bash_aliases.unlink()
 
-def test_line_exists_in_file_no_exists(bash_aliases):
+
+def test_remove_aliases(aliases, bash_aliases):
+
+    main._add_aliases(aliases, bash_aliases)
+    main._remove_aliases(aliases, bash_aliases)
+    assert bash_aliases.read_text() == ''
+    bash_aliases.unlink()
+
+
+def test_line_in_file(bash_aliases):
+
+    bash_aliases.write_text('test string')
+    assert main._line_in_file('test string', bash_aliases)
+    bash_aliases.unlink()
+
+def test_line_in_file_not(bash_aliases):
 
     bash_aliases.write_text('no string')
-    assert not main._line_exists_in_file('no match', bash_aliases)
+    assert not main._line_in_file('no match', bash_aliases)
     bash_aliases.unlink()
