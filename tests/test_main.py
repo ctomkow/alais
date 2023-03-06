@@ -4,7 +4,7 @@ from alais import main
 
 # python imports
 import os
-from typing import Dict
+from typing import List
 from pathlib import Path
 
 # 3rd party imports
@@ -19,60 +19,54 @@ def setup():
 
 
 @pytest.fixture
-def aliases() -> Dict:
+def shell_code() -> List[str]:
 
-    return {
-        'fdsa': 'asdf',
-        'asd': 'asdf',
-        'asf': 'asdf',
-    }
+    return [
+        'if [ -f ~/.alais ]; then # written by alais\n',
+        '    . ~/.alais # written by alais\n',
+        'fi # written by alais\n'
+    ]
 
 @pytest.fixture
-def bash_aliases() -> Path:
+def test_file() -> Path:
 
-    return Path('.bash_aliases')
-
-
-def test_add_preamble(bash_aliases):
-
-    main._add_preamble(bash_aliases)
-    assert bash_aliases.read_text() == '# written by alais\n'
-    bash_aliases.unlink()
+    return Path('.test_file')
 
 
-def test_add_aliases(aliases, bash_aliases):
+# todo: test_copy_file
 
-    main._add_aliases(aliases, bash_aliases)
-    with bash_aliases.open() as fp:
-        for i, line in enumerate(fp):
-            assert line == f"alias {list(aliases)[i]}='{list(aliases.values())[i]}'\n"
-    bash_aliases.unlink()
+def test_delete_file_safely(test_file):
 
-
-def test_remove_preamble(bash_aliases):
-
-    main._add_preamble(bash_aliases)
-    main._remove_preamble(bash_aliases)
-    assert bash_aliases.read_text() == ''
-    bash_aliases.unlink()
+    test_file.write_text('test')
+    main._delete_file_safely(test_file)
+    assert not test_file.exists()
 
 
-def test_remove_aliases(aliases, bash_aliases):
+def test_append_to_file_safely(shell_code, test_file):
 
-    main._add_aliases(aliases, bash_aliases)
-    main._remove_aliases(aliases, bash_aliases)
-    assert bash_aliases.read_text() == ''
-    bash_aliases.unlink()
+    main._append_to_file_safely(shell_code, test_file)
+    main._append_to_file_safely(shell_code, test_file)
+    with test_file.open() as fp:
+        assert len(fp.readlines()) == 3
+    test_file.unlink()
 
 
-def test_line_in_file(bash_aliases):
+def test_delete_from_file(shell_code, test_file):
 
-    bash_aliases.write_text('test string')
-    assert main._line_in_file('test string', bash_aliases)
-    bash_aliases.unlink()
+    main._append_to_file_safely(shell_code, test_file)
+    main._delete_from_file(shell_code, test_file)
+    assert test_file.read_text() == ''
+    test_file.unlink()
 
-def test_line_in_file_not(bash_aliases):
 
-    bash_aliases.write_text('no string')
-    assert not main._line_in_file('no match', bash_aliases)
-    bash_aliases.unlink()
+def test_line_in_file(test_file):
+
+    test_file.write_text('test string')
+    assert main._line_in_file('test string', test_file)
+    test_file.unlink()
+
+def test_line_in_file_not(test_file):
+
+    test_file.write_text('no string')
+    assert not main._line_in_file('no match', test_file)
+    test_file.unlink()

@@ -1,4 +1,6 @@
 # Craig Tomkow, 2023
+import re
+import shutil
 
 # local imports
 from alais.version import __version__
@@ -7,7 +9,8 @@ from alais.version import __version__
 from pathlib import Path
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, Namespace
 from re import sub
-from typing import Dict
+from typing import List
+from shutil import copy
 
 
 def entrypoint():
@@ -23,71 +26,78 @@ def _flags(version: str) -> ArgumentParser:
         prog='alais',
         formatter_class=RawDescriptionHelpFormatter,
         description="""
-An alais for your terminal typos
+Aliases for your terminal typos
 
-> alais me
-> alais me-not
+> alais add
+> alais remove
+
+How it works
+------------
+It copies .alais to your home directory. This contains aliases and functions. Aliases are used to fix common
+typos. Functions are used to protect you from the bad effects of typos.
 """)
     # all flags here
     parser.add_argument('-v', '--version', action='version', version=f"%(prog)s {version}")
     sub_parser = parser.add_subparsers()
-    key = sub_parser.add_parser('me', description='Install the alais')
-    key.add_argument('me', action='store_true')
-    key = sub_parser.add_parser('me-not', description='Install the alais')
-    key.add_argument('me-not', action='store_true')
+    key = sub_parser.add_parser('add', description='Add the aliases')
+    key.add_argument('add', action='store_true')
+    key = sub_parser.add_parser('remove', description='Remove the aliases')
+    key.add_argument('remove', action='store_true')
 
     return parser
 
 
 def _parse_input(args: Namespace) -> None:
 
-    bash_aliases = Path(Path.home(), '.bash_aliases')
+    bashrc = Path(Path.home(), '.bashrc')
+    alais = Path(Path(__file__).resolve().parents[0], '.alais')
 
-    if 'me' in args:
-        _add_preamble(bash_aliases)
-        _add_aliases(custom_aliases, bash_aliases)
-        print("alais'd!")
-    elif 'me-not' in args:
-        _remove_aliases(custom_aliases, bash_aliases)
-        print("unalais'd!")
+    shell_code_to_source_alais = [
+        'if [ -f ~/.alais ]; then # written by alais\n',
+        '    . ~/.alais # written by alais\n',
+        'fi # written by alais\n'
+    ]
 
-
-# idempotent
-def _add_preamble(bash_aliases: Path) -> None:
-
-    if not _line_in_file('# written by alais\n', bash_aliases):
-        with bash_aliases.open('a') as fp:
-            fp.write('# written by alais\n')
-
-
-# idempotent
-def _add_aliases(aliases: Dict, bash_aliases: Path) -> None:
-
-    with bash_aliases.open('a') as fp:
-        for k, v in aliases.items():
-            alias = f"alias {k}='{v}'\n"
-            if not _line_in_file(alias, bash_aliases):
-                fp.write(alias)
+    if 'add' in args:
+        _copy_file(alais, Path.home())
+        _append_to_file_safely(shell_code_to_source_alais, bashrc)
+        # todo: source .bashrc
+        print(".alais installed and .bashrc modified")
+    elif 'remove' in args:
+        _delete_file_safely(Path(Path.home(), '.alais'))
+        _delete_from_file(shell_code_to_source_alais, bashrc)
+        # todo: source .bashrc
+        print(".alais deleted and .bashrc modifications reverted")
 
 
-def _remove_preamble(bash_aliases: Path) -> None:
+def _copy_file(file: Path, dest: Path) -> None:
 
-    with bash_aliases.open('r') as fp:
-        user_bash_aliases = fp.readlines()
-
-    with bash_aliases.open('w') as fp:
-        for line in user_bash_aliases:
-            fp.write(sub(r'^# written by alais\n', '', line))
+    shutil.copy(file.absolute().as_posix(), dest.absolute().as_posix())
 
 
-def _remove_aliases(aliases: Dict, bash_aliases: Path) -> None:
+def _delete_file_safely(file: Path) -> None:
 
-    for k, v in aliases.items():
-        with bash_aliases.open('r') as fp:
-            user_bash_aliases = fp.readlines()
-        with bash_aliases.open('w') as fp:
-            for line in user_bash_aliases:
-                fp.write(sub(fr"^alias {k}='{v}'\n$", '', line))
+    if file.exists():
+        file.unlink()
+
+# this is idempotent
+def _append_to_file_safely(text: List[str], file: Path) -> None:
+
+    with file.open('a') as fp:
+        for line in text:
+            if not _line_in_file(line, file):
+                fp.write(line)
+
+
+def _delete_from_file(text: List[str], file: Path) -> None:
+
+    for line in text:
+        with file.open('r') as fp:
+            file_lines = fp.readlines()
+        with file.open('w') as fp:
+            for existing_line in file_lines:
+                print(re.escape(line))
+                fp.write(sub(fr"^{re.escape(line)}$", '', existing_line))
 
 
 def _line_in_file(elem: str, file: Path) -> bool:
@@ -100,85 +110,3 @@ def _line_in_file(elem: str, file: Path) -> bool:
         if elem == line:
             return True
     return False
-
-
-custom_function_aliases = False
-
-# thanks chatGPT!
-custom_aliases = {
-    'clera': 'clear',
-    'claer': 'clear',
-    'celar': 'clear',
-    'cler': 'clear',
-    'cear': 'clear',
-    'gerp': 'grep',
-    'greap': 'grep',
-    'grpe': 'grep',
-    'igt': 'git',
-    'gi': 'git',
-    'got': 'git',
-    'jit': 'git',
-    'gti': 'git',
-    'sodo': 'sudo',
-    'sudu': 'sudo',
-    'sodo': 'sudo',
-    'sduo': 'sudo',
-    'lls': 'ls',
-    'lis': 'ls',
-    'lsl': 'ls',
-    'os': 'ls',
-    'cv': 'cd',
-    'cx': 'cd',
-    'cds': 'cd',
-    'mkidr': 'mkdir',
-    'mkrdir': 'mkdir',
-    'makedir': 'mkdir',
-    'makdir': 'mkdir',
-    'mdir': 'mkdir',
-    'mroe': 'more',
-    'pign': 'ping',
-    'pang': 'ping',
-    'pnig': 'ping',
-    'pimg': 'ping',
-    'comod': 'chmod',
-    'chomd': 'chmod',
-    'chmode': 'chmod',
-    'chmoe': 'chmod',
-    'tarr': 'tar',
-    'tare': 'tar',
-    'atr': 'tar',
-    'eixt': 'exit',
-    'catr': 'cat',
-    'ca': 'cat',
-    'catt': 'cat',
-    'cta': 'cat',
-    'akw': 'awk',
-    'wak': 'awk',
-    'awkk': 'awk',
-    'wka': 'awk',
-    'esd': 'sed',
-    'sde': 'sed',
-    'se': 'sed',
-    'fidn': 'find',
-    'fnd': 'find',
-    'finf': 'find',
-    'fimd': 'find',
-    'tpo': 'top',
-    'to': 'top',
-    'sp': 'ps',
-    'shh': 'ssh',
-    'sah': 'ssh',
-    'hss': 'ssh',
-    'csp': 'scp',
-    'scl': 'scp',
-    'sxp': 'scp',
-    'wegt': 'wget',
-    'get': 'wget',
-    'wet': 'wget',
-    'wger': 'wget',
-    'crl': 'curl',
-    'culr': 'curl',
-    'cur': 'curl',
-    'curel': 'curl',
-    'crul': 'curl',
-}
