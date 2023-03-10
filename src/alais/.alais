@@ -74,6 +74,12 @@ alias culr='curl'
 alias cur='curl'
 alias curel='curl'
 alias crul='curl'
+alias ech='echo'
+alias ecoh='echo'
+alias eho='echo'
+alias echi='echo'
+alias echp='echo'
+alias ecno='echo'
 
 # functions to protect against typos
 function sudo () {
