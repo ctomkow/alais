@@ -15,6 +15,7 @@ alias gti='git'
 alias sodo='sudo'
 alias sudu='sudo'
 alias sduo='sudo'
+alais suod='sudo'
 alias lls='ls'
 alias lis='ls'
 alias cv='cd'
@@ -80,6 +81,15 @@ alias eho='echo'
 alias echi='echo'
 alias echp='echo'
 alias ecno='echo'
+
+function git () {
+    if [[ "$1" = "cloen" || "$1" = "clonr" || "$1" = "clonne" || "$1" = "clon" || "$1" = "colne" ]]
+    then
+        /usr/bin/git clone "${@:2}";
+        return;
+    fi
+    /usr/bin/git "$@";
+}
 
 # functions to protect against typos
 function sudo () {
