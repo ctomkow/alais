@@ -1,6 +1,4 @@
 # Craig Tomkow, 2023
-import re
-import shutil
 
 # local imports
 from alais.version import __version__
@@ -8,7 +6,7 @@ from alais.version import __version__
 # python imports
 from pathlib import Path
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, Namespace
-from re import sub
+from re import escape, sub
 from typing import List
 from shutil import copy
 
@@ -61,18 +59,16 @@ def _parse_input(args: Namespace) -> None:
     if 'add' in args:
         _copy_file(alais, Path.home())
         _append_to_file_safely(shell_code_to_source_alais, bashrc)
-        # todo: source .bashrc
         print(".alais installed and .bashrc modified")
     elif 'remove' in args:
         _delete_file_safely(Path(Path.home(), '.alais'))
         _delete_from_file(shell_code_to_source_alais, bashrc)
-        # todo: source .bashrc
         print(".alais deleted and .bashrc modifications reverted")
 
 
 def _copy_file(file: Path, dest: Path) -> None:
 
-    shutil.copy(file.absolute().as_posix(), dest.absolute().as_posix())
+    copy(file.absolute().as_posix(), dest.absolute().as_posix())
 
 
 def _delete_file_safely(file: Path) -> None:
@@ -96,8 +92,8 @@ def _delete_from_file(text: List[str], file: Path) -> None:
             file_lines = fp.readlines()
         with file.open('w') as fp:
             for existing_line in file_lines:
-                print(re.escape(line))
-                fp.write(sub(fr"^{re.escape(line)}$", '', existing_line))
+                print(escape(line))
+                fp.write(sub(fr"^{escape(line)}$", '', existing_line))
 
 
 def _line_in_file(elem: str, file: Path) -> bool:

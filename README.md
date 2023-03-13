@@ -12,7 +12,7 @@ Aliases for your terminal typos
 
 ## add aliases
 1. `alais add`
-2. `. .alais`
+2. `. .bashrc`
 
 ## remove aliases
 1. `alais remove`
