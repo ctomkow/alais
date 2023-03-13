@@ -136,7 +136,7 @@ function git () {
 
 # git commit
 function git () {
-    if [[ "$1" = "commmit" || "$1" = "commiti" || "$1" = "cmomit" || "$1" = "committ" || "$1" = "tcommit" ]]
+    if [[ "$1" = "commmit" || "$1" = "commiti" || "$1" = "cmomit" || "$1" = "committ" || "$1" = "tcommit" || "$1" = "ocmmit" ]]
     then
         /usr/bin/git commit "${@:2}";
         return;
