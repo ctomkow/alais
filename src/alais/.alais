@@ -82,8 +82,31 @@ alias echi='echo'
 alias echp='echo'
 alias ecno='echo'
 
+# git sub-command typo fixes
+
+# git init
 function git () {
-    if [[ "$1" = "cloen" || "$1" = "clonr" || "$1" = "clonne" || "$1" = "clon" || "$1" = "colne" ]]
+    if [[ "$1" = "inint" || "$1" = "itit" || "$1" = "innit" || "$1" = "inot" || "$1" = "inut" || "$1" = "tinit" ]]
+    then
+        /usr/bin/git init "${@:2}";
+        return;
+    fi
+    /usr/bin/git "$@";
+}
+
+# git add
+function git () {
+    if [[ "$1" = "ad" || "$1" = "ade" || "$1" = "tadd" ]]
+    then
+        /usr/bin/git add "${@:2}";
+        return;
+    fi
+    /usr/bin/git "$@";
+}
+
+# git clone
+function git () {
+    if [[ "$1" = "cloen" || "$1" = "clonr" || "$1" = "clonne" || "$1" = "clon" || "$1" = "colne" || "$1" = "tclone" ]]
     then
         /usr/bin/git clone "${@:2}";
         return;
@@ -91,10 +114,31 @@ function git () {
     /usr/bin/git "$@";
 }
 
+# git pull
 function git () {
-    if [[ "$1" = "pish" || "$1" = "puch" || "$1" = "psuh" || "$1" = "pushh" || "$1" = "puhs" ]]
+    if [[ "$1" = "pll" || "$1" = "pul" || "$1" = "pulll" || "$1" = "poul" || "$1" = "tpull" ]]
+    then
+        /usr/bin/git pull "${@:2}";
+        return;
+    fi
+    /usr/bin/git "$@";
+}
+
+# git push
+function git () {
+    if [[ "$1" = "pish" || "$1" = "puch" || "$1" = "psuh" || "$1" = "pushh" || "$1" = "puhs" || "$1" = "tpush" ]]
     then
         /usr/bin/git push "${@:2}";
+        return;
+    fi
+    /usr/bin/git "$@";
+}
+
+# git commit
+function git () {
+    if [[ "$1" = "commmit" || "$1" = "commiti" || "$1" = "cmomit" || "$1" = "committ" || "$1" = "tcommit" ]]
+    then
+        /usr/bin/git commit "${@:2}";
         return;
     fi
     /usr/bin/git "$@";
