@@ -4,11 +4,15 @@ Aliases for your terminal typos
 
 `pip install --user alais`
 
+**or** install the bleeding edge version
+
+`pip install --user git+https://github.com/ctomkow/alais.git`
+
 <br>
 
 ## add aliases
 1. `alais add`
-2. `. .bashrc`
+2. `. .alais`
 
 ## remove aliases
 1. `alais remove`
@@ -25,9 +29,9 @@ e.g. you can type `clera` and your terminal will execute the `clear` command.
 See the .alais file in your home directory for all aliases.
 
 ### shell functions
-.alais also contains functions to protect yourself from a typo.
+.alais also contains functions to fix sub-command typos and to protect yourself from a destructive typo.
 
-Currently, the only function is `sudo`. It parses the sudo command matching on `rm -rf /` and `rm -fr /`. If it matches it outputs `pls no` then exists, else, your command continues as normal.
+e.g. It parses the `sudo` command matching on `rm -rf /` and `rm -fr /`. If it matches, it outputs `pls no` then exits, else, your command continues as normal.
 
 ## PR's welcome
 Restrictions
