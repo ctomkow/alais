@@ -91,6 +91,15 @@ function git () {
     /usr/bin/git "$@";
 }
 
+function git () {
+    if [[ "$1" = "pish" || "$1" = "puch" || "$1" = "psuh" || "$1" = "pushh" || "$1" = "puhs" ]]
+    then
+        /usr/bin/git push "${@:2}";
+        return;
+    fi
+    /usr/bin/git "$@";
+}
+
 # functions to protect against typos
 function sudo () {
     if [[ "$1" = "rm" && "$2" = "-rf" && "$3" = "/" ]] || [[ "$1" = "rm" && "$2" = "-fr" && "$3" = "/" ]]
